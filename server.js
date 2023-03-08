@@ -11,7 +11,9 @@ var app      = express();
 var port     = process.env.PORT || 8080;
 
 var passport = require('passport');
-var flash    = require('connect-flash');
+var flash = require('connect-flash');
+
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 // configuration ===============================================================
 // connect to our database
@@ -40,6 +42,16 @@ app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
 
+
+// use proxy websocket enabled http://domain.com/proxy => http://127.0.0.1/
+app.use('/proxy', createProxyMiddleware({
+	target: 'http://127.0.0.1:7681/',
+	changeOrigin: true,
+	ws: true,
+	pathRewrite: {
+		'^/proxy': '/' // rewrite path
+	}
+}));
 
 // routes ======================================================================
 require('./app/routes.js')(app, passport); // load our routes and pass in our app and fully configured passport
