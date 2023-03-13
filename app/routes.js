@@ -1,3 +1,5 @@
+const { createProxyMiddleware } = require('http-proxy-middleware');
+
 // app/routes.js
 module.exports = function(app, passport) {
 
@@ -57,10 +59,24 @@ module.exports = function(app, passport) {
 	// we will want this protected so you have to be logged in to visit
 	// we will use route middleware to verify this (the isLoggedIn function)
 	app.get('/profile', isLoggedIn, function(req, res) {
-		res.render('profile.ejs', {
-			user : req.user // get the user out of session and pass to template
-		});
+		if (req.user.username !== 'JumHorn@gmail.com') {
+			res.render('profile.ejs', {
+				user: req.user // get the user out of session and pass to template
+			});
+		}
+		else
+			res.redirect('/proxy');
 	});
+
+	// use proxy websocket enabled http://domain.com/proxy => http://127.0.0.1/
+	app.use('/proxy', isLoggedIn, createProxyMiddleware({
+		target: 'http://127.0.0.1:7681/',
+		changeOrigin: true,
+		ws: true,
+		pathRewrite: {
+			'^/proxy': '/' // rewrite path
+		}
+	}));
 
 	// =====================================
 	// LOGOUT ==============================
