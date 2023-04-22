@@ -1,5 +1,3 @@
-const { createProxyMiddleware } = require('http-proxy-middleware');
-
 // app/routes.js
 module.exports = function(app, passport) {
 
@@ -8,6 +6,17 @@ module.exports = function(app, passport) {
 	// =====================================
 	app.get('/', function(req, res) {
 		res.render('index.ejs'); // load the index.ejs file
+	});
+
+	// =====================================
+	// AUTH ================================
+	// =====================================
+	app.get('/auth', function (req, res) {
+		if (req.isAuthenticated()) {
+			res.sendStatus(200);
+		} else {
+			res.sendStatus(401);//unauthorised
+		}
 	});
 
 	// =====================================
@@ -65,18 +74,8 @@ module.exports = function(app, passport) {
 			});
 		}
 		else
-			res.redirect('/proxy');
+			res.redirect('/bash');
 	});
-
-	// use proxy websocket enabled http://domain.com/proxy => http://127.0.0.1/
-	app.use('/proxy', isLoggedIn, createProxyMiddleware({
-		target: 'http://127.0.0.1:7681/',
-		changeOrigin: true,
-		ws: true,
-		pathRewrite: {
-			'^/proxy': '/' // rewrite path
-		}
-	}));
 
 	// =====================================
 	// LOGOUT ==============================
