@@ -5,14 +5,18 @@ module.exports = function(app, passport) {
 	// HOME PAGE (with login links) ========
 	// =====================================
 	app.get('/', function(req, res) {
-		res.render('index.ejs'); // load the index.ejs file
+		if (req.isAuthenticated()) {
+			res.redirect('/profile');
+		} else {
+			res.render('index.ejs'); // load the index.ejs file
+		}
 	});
 
 	// =====================================
 	// AUTH ================================
 	// =====================================
 	app.get('/auth', function (req, res) {
-		if (req.isAuthenticated()) {
+		if (req.isAuthenticated() && req.user.level >= 7) {
 			res.sendStatus(200);
 		} else {
 			res.sendStatus(401);//unauthorised
@@ -24,9 +28,12 @@ module.exports = function(app, passport) {
 	// =====================================
 	// show the login form
 	app.get('/login', function(req, res) {
-
-		// render the page and pass in any flash data if it exists
-		res.render('login.ejs', { message: req.flash('loginMessage') });
+		if (req.isAuthenticated()) {
+			res.redirect('/profile');
+		} else {
+			// render the page and pass in any flash data if it exists
+			res.render('login.ejs', { message: req.flash('loginMessage') });
+		}
 	});
 
 	// process the login form
@@ -43,7 +50,7 @@ module.exports = function(app, passport) {
             } else {
               req.session.cookie.expires = false;
             }
-        res.redirect('/');
+        	res.redirect('/');
     });
 
 	// =====================================

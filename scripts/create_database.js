@@ -14,9 +14,10 @@ CREATE TABLE `' + dbconfig.database + '`.`' + dbconfig.users_table + '` ( \
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, \
     `username` VARCHAR(20) NOT NULL, \
     `password` CHAR(60) NOT NULL, \
-        PRIMARY KEY (`id`), \
-    UNIQUE INDEX `id_UNIQUE` (`id` ASC), \
-    UNIQUE INDEX `username_UNIQUE` (`username` ASC) \
+    `level` int DEFAULT \'0\' COMMENT \'用户等级\', \
+    PRIMARY KEY (`id`), \
+    UNIQUE INDEX `id_UNIQUE` (`id`), \
+    UNIQUE INDEX `username_UNIQUE` (`username`) \
 )');
 
 console.log('Success: Database Created!')
