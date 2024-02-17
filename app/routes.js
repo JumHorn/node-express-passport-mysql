@@ -19,7 +19,7 @@ module.exports = function(app, passport) {
 		if (req.isAuthenticated() && req.user.level >= 7) {
 			res.sendStatus(200);
 		} else {
-			res.sendStatus(401);//unauthorised
+			res.sendStatus(401);//unauthorized
 		}
 	});
 
