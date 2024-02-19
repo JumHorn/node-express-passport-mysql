@@ -30,12 +30,17 @@ app.use(bodyParser.json());
 
 app.set('view engine', 'ejs'); // set up ejs for templating
 
+var sessionStore = new mysqlStore({
+	clearExpired: true,
+	checkExpirationInterval: 2592000000, //a month 2592000000
+}, dbconnection);
+
 // required for passport
 app.use(session({
 	secret: '8390f984-cee0-11ee-b656-577fdb85d159',
 	resave: false,
 	saveUninitialized: false,
-	store: new mysqlStore({}, dbconnection), // 创建 MySQLStore 实例
+	store: sessionStore, // 创建 MySQLStore 实例
 	cookie: {
 		httpOnly: true,
 		maxAge: 1000 * 60 * 60 * 24 * 30,//a month
