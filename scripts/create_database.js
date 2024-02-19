@@ -9,6 +9,7 @@ var connection = mysql.createConnection(dbconfig.connection);
 
 connection.query('CREATE DATABASE ' + dbconfig.database);
 
+// create user table
 connection.query('\
 CREATE TABLE `' + dbconfig.database + '`.`' + dbconfig.users_table + '` ( \
     `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, \
@@ -19,6 +20,18 @@ CREATE TABLE `' + dbconfig.database + '`.`' + dbconfig.users_table + '` ( \
     UNIQUE INDEX `id_UNIQUE` (`id`), \
     UNIQUE INDEX `username_UNIQUE` (`username`) \
 )');
+
+// create session table
+connection.query('\
+CREATE TABLE `sessions` ( \
+	`session_id` varchar(128) COLLATE utf8mb4_bin NOT NULL, \
+	`expires` int unsigned NOT NULL, \
+	`data` mediumtext COLLATE utf8mb4_bin, \
+	PRIMARY KEY (`session_id`) \
+) ENGINE InnoDB, \
+  CHARSET utf8mb4, \
+  COLLATE utf8mb4_0900_ai_ci; \
+');
 
 console.log('Success: Database Created!')
 
