@@ -4,15 +4,15 @@ module.exports = {
         'host': 'localhost',
         'user': 'root',
         'password': 'password',
-		'ssl': {},
-		retry: {
-			enabled: true,
-			retries: 5,
-			factor: 2,
-			minTimeout: 1000,
-			maxTimeout: 5000,
-		},
+        'database': 'database_name',
+        'ssl': {},
+        retry: {
+            enabled: true,
+            retries: 5,
+            factor: 2,
+            minTimeout: 1000,
+            maxTimeout: 5000,
+        },
     },
-	'database': 'my_schema',
-    'users_table': 'users'
+    'users_table': 'users_table_name'
 };
