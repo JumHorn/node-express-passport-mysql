@@ -21,6 +21,8 @@
 
             <!-- LOGIN FORM -->
             <form action="/login" method="post">
+                <input type="hidden" name="redirect" value="<%= redirect %>">
+                <!-- redirect 目标页由隐藏字段传递，不写入 session -->
                 <div class="form-group">
                     <label>Username</label>
                     <input type="text" class="form-control" name="username">

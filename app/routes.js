@@ -28,34 +28,42 @@ module.exports = function(app, passport) {
 	// =====================================
 	// show the login form
 	app.get('/login', function (req, res) {
-		// save previous uri
-		if (req.query.redirect) {
-			req.session.redirect = req.query.redirect;
-		}
-
 		if (req.isAuthenticated()) {
 			res.redirect('/profile');
 		} else {
 			// render the page and pass in any flash data if it exists
-			res.render('login.ejs', { message: req.flash('loginMessage') });
+			res.render('login.ejs', { message: '', redirect: req.query.redirect || '' });
 		}
 	});
 
 	// process the login form
-	// process the login form
-	app.post('/login', passport.authenticate('local-login', {
-            successRedirect : '/profile', // redirect to the secure profile section
-            failureRedirect : '/login', // redirect back to the signup page if there is an error
-            failureFlash : true // allow flash messages
-		}),
-		function (req, res) {
-			if (req.body.remember) {
-				req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30; // 30天;
-			} else {
-				req.session.cookie.expires = false;//关闭浏览器失效
+	app.post('/login', function (req, res, next) {
+		passport.authenticate('local-login', function (err, user, info) {
+			if (err) { return next(err); }
+			if (!user) {
+				// 登录失败：错误信息直接随本次响应渲染（不经过 flash），
+				// 失败的登录不会向 sessions 表写入任何数据
+				return res.render('login.ejs', {
+					message: (info && info.message) || '',
+					redirect: req.body.redirect || ''
+				});
 			}
-			res.redirect(req.session.redirect);
-		});
+			req.logIn(user, function (err) {
+				if (err) { return next(err); }
+				if (req.body.remember) {
+					req.session.cookie.maxAge = 1000 * 60 * 60 * 24 * 30; // 30天;
+				} else {
+					req.session.cookie.expires = false;//关闭浏览器失效
+				}
+				// redirect 目标页只在登录成功后才写入 session（此时已是登录用户）
+				var redirectTo = req.body.redirect;
+				if (typeof redirectTo === 'string' && redirectTo.charAt(0) === '/' && redirectTo.charAt(1) !== '/') {
+					req.session.redirect = redirectTo;
+				}
+				res.redirect('/profile');
+			});
+		})(req, res, next);
+	});
 
 	// =====================================
 	// SIGNUP ==============================
@@ -63,15 +71,23 @@ module.exports = function(app, passport) {
 	// show the signup form
 	app.get('/signup', function(req, res) {
 		// render the page and pass in any flash data if it exists
-		res.render('signup.ejs', { message: req.flash('signupMessage') });
+		res.render('signup.ejs', { message: '' });
 	});
 
 	// process the signup form
-	app.post('/signup', passport.authenticate('local-signup', {
-		successRedirect : '/profile', // redirect to the secure profile section
-		failureRedirect : '/signup', // redirect back to the signup page if there is an error
-		failureFlash : true // allow flash messages
-	}));
+	app.post('/signup', function (req, res, next) {
+		passport.authenticate('local-signup', function (err, user, info) {
+			if (err) { return next(err); }
+			if (!user) {
+				// 注册失败：错误信息直接随本次响应渲染，不写入 session
+				return res.render('signup.ejs', { message: (info && info.message) || '' });
+			}
+			req.logIn(user, function (err) {
+				if (err) { return next(err); }
+				res.redirect('/profile');
+			});
+		})(req, res, next);
+	});
 
 	// =====================================
 	// PROFILE SECTION =========================

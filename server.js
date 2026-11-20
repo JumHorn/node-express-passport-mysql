@@ -32,7 +32,7 @@ app.set('view engine', 'ejs'); // set up ejs for templating
 
 var sessionStore = new mysqlStore({
 	clearExpired: true,
-	checkExpirationInterval: 2147483647, //a month 2592000000
+	checkExpirationInterval: 1000 * 60 * 60 * 24 * 15,//15 days
 }, dbconnection);
 
 // 服务启动时立即清理一次历史遗留的过期 session
