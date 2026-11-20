@@ -28,6 +28,7 @@ CREATE TABLE `sessions` ( \
 	`expires` int unsigned NOT NULL, \
 	`data` mediumtext COLLATE utf8mb4_bin, \
 	PRIMARY KEY (`session_id`) \
+	INDEX `expires_idx` (`expires`) \
 ) ENGINE InnoDB, \
   CHARSET utf8mb4, \
   COLLATE utf8mb4_0900_ai_ci; \

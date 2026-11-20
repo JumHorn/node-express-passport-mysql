@@ -35,6 +35,15 @@ var sessionStore = new mysqlStore({
 	checkExpirationInterval: 2147483647, //a month 2592000000
 }, dbconnection);
 
+// 服务启动时立即清理一次历史遗留的过期 session
+sessionStore.clearExpiredSessions(function (err) {
+	if (err) {
+		console.error('[session] 启动时清理过期 session 失败: ' + err.message);
+	} else {
+		console.log('[session] 已清理过期的 session');
+	}
+});
+
 // required for passport
 app.use(session({
 	secret: '8390f984-cee0-11ee-b656-577fdb85d159',
